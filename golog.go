@@ -42,7 +42,7 @@ func (l *log) Configure(config *Config) (bool, error) {
 		l.config.LogEnvironment = config.LogEnvironment
 	}
 	if os.Getenv("GOLOG_ENV") != "" {
-		if os.Getenv("GOLOG_ENV") == DEVELOPMENT || os.Getenv("GOLOG_ENV") == STAGING || os.Getenv("GOLOG_ENV") == PRODUCTION {
+		if os.Getenv("GOLOG_ENV") == CONFIG_ENV_DEVELOPMENT || os.Getenv("GOLOG_ENV") == CONFIG_ENV_STAGING || os.Getenv("GOLOG_ENV") == CONFIG_ENV_PRODUCTION {
 			l.config.LogEnvironment = os.Getenv("GOLOG_ENV")
 		}
 	}
@@ -53,18 +53,17 @@ func (l *log) Configure(config *Config) (bool, error) {
 }
 
 func (l *log) Debug(message string, args ...any) {
-	if l.shouldLog(DEBUG) {
+	if l.shouldLog(CONFIG_LOG_LEVEL_DEBUG) {
 		if args != nil {
 			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
 		} else {
-			l.config.writer.Write([]byte(fmt.Sprintf("[%s] - [ENV:%s] - [DEBUG]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)))
-			//fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
+			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
 		}
 	}
 }
 
 func (l *log) Info(message string, args ...any) {
-	if l.shouldLog(INFO) {
+	if l.shouldLog(CONFIG_LOG_LEVEL_WARN) {
 		if args != nil {
 			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [INFO]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
 		} else {
@@ -74,7 +73,7 @@ func (l *log) Info(message string, args ...any) {
 }
 
 func (l *log) Warn(message string, args ...any) {
-	if l.shouldLog(WARN) {
+	if l.shouldLog(CONFIG_LOG_LEVEL_WARN) {
 		if args != nil {
 			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [WARN]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
 		} else {
@@ -84,7 +83,7 @@ func (l *log) Warn(message string, args ...any) {
 }
 
 func (l *log) Error(message string, args ...any) {
-	if l.shouldLog(ERROR) {
+	if l.shouldLog(CONFIG_LOG_LEVEL_ERROR) {
 		if args != nil {
 			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [ERROR]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
 		} else {
@@ -95,14 +94,14 @@ func (l *log) Error(message string, args ...any) {
 
 func (l *log) shouldLog(logtype int) bool {
 	switch logtype {
-	case DEBUG:
-		return l.config.LogEnvironment == DEVELOPMENT
-	case INFO:
-		return l.config.LogEnvironment == DEVELOPMENT || l.config.LogEnvironment == STAGING
-	case WARN:
-		return l.config.LogEnvironment == DEVELOPMENT || l.config.LogEnvironment == STAGING || l.config.LogEnvironment == PRODUCTION
-	case ERROR:
-		return l.config.LogEnvironment == DEVELOPMENT || l.config.LogEnvironment == STAGING || l.config.LogEnvironment == PRODUCTION
+	case CONFIG_LOG_LEVEL_DEBUG:
+		return l.config.LogEnvironment == CONFIG_ENV_DEVELOPMENT
+	case CONFIG_LOG_LEVEL_INFO:
+		return l.config.LogEnvironment == CONFIG_ENV_DEVELOPMENT || l.config.LogEnvironment == CONFIG_ENV_STAGING
+	case CONFIG_LOG_LEVEL_WARN:
+		return l.config.LogEnvironment == CONFIG_ENV_DEVELOPMENT || l.config.LogEnvironment == CONFIG_ENV_STAGING || l.config.LogEnvironment == CONFIG_ENV_PRODUCTION
+	case CONFIG_LOG_LEVEL_ERROR:
+		return l.config.LogEnvironment == CONFIG_ENV_DEVELOPMENT || l.config.LogEnvironment == CONFIG_ENV_STAGING || l.config.LogEnvironment == CONFIG_ENV_PRODUCTION
 	default:
 		return false
 	}
