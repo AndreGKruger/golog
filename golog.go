@@ -57,7 +57,8 @@ func (l *log) Debug(message string, args ...any) {
 		if args != nil {
 			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
 		} else {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
+			l.config.writer.Write([]byte(fmt.Sprintf("[%s] - [ENV:%s] - [DEBUG]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)))
+			//fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
 		}
 	}
 }
