@@ -1,7 +1,7 @@
 package golog
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"os"
 )
@@ -37,13 +37,13 @@ type Config struct {
 
 func (c *Config) isValid() (bool, error) {
 	if c.LogTo != CONFIG_LOG_TO_CONSOLE && c.LogTo != CONFIG_LOG_TO_FILE {
-		return false, fmt.Errorf("invalid LogTo value")
+		return false, errors.New("invalid LogTo value")
 	}
 	if c.OutputFormat != CONFIG_OUTPUT_FORMAT_JSON && c.OutputFormat != CONFIG_OUTPUT_FORMAT_TEXT {
-		return false, fmt.Errorf("invalid OutputFormat value")
+		return false, errors.New("invalid OutputFormat value")
 	}
 	if c.LogEnvironment != CONFIG_ENV_DEVELOPMENT && c.LogEnvironment != CONFIG_ENV_STAGING && c.LogEnvironment != CONFIG_ENV_PRODUCTION {
-		return false, fmt.Errorf("invalid LogEnvironment value")
+		return false, errors.New("invalid LogEnvironment value")
 	}
 	return true, nil
 }

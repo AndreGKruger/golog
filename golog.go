@@ -1,9 +1,8 @@
 package golog
 
 import (
-	"fmt"
+	"log"
 	"os"
-	"time"
 )
 
 type Log interface {
@@ -15,19 +14,23 @@ type Log interface {
 	shouldLog(logtype int) bool
 }
 
-type log struct {
+type golog struct {
 	config *Config
+	log    *log.Logger
 }
 
 // Returns a new Log instance with default configuration
 func New() Log {
 	cnf := Config{}
 	cnf.setupDefault()
-	return &log{config: &cnf}
+	return &golog{
+		config: &cnf,
+		log:    log.New(cnf.writer, "[ ", log.LstdFlags),
+	}
 }
 
 // Custom configuration for the logger
-func (l *log) Configure(config *Config) (bool, error) {
+func (l *golog) Configure(config *Config) (bool, error) {
 	if valid, err := config.isValid(); !valid {
 		return false, err
 	}
@@ -38,6 +41,7 @@ func (l *log) Configure(config *Config) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	l.log.SetOutput(config.writer)
 	if config.LogEnvironment != "" {
 		l.config.LogEnvironment = config.LogEnvironment
 	}
@@ -52,47 +56,47 @@ func (l *log) Configure(config *Config) (bool, error) {
 	return true, nil
 }
 
-func (l *log) Debug(message string, args ...any) {
+func (l *golog) Debug(message string, args ...any) {
 	if l.shouldLog(CONFIG_LOG_LEVEL_DEBUG) {
 		if args != nil {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
+			l.log.Printf("] - [ENV:%s] - [DEBUG]: %s  - [ARGS]: %d\n", l.config.LogEnvironment, message, args)
 		} else {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [DEBUG]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
+			l.log.Printf("] - [ENV:%s] - [DEBUG]: %s\n", l.config.LogEnvironment, message)
 		}
 	}
 }
 
-func (l *log) Info(message string, args ...any) {
+func (l *golog) Info(message string, args ...any) {
+	if l.shouldLog(CONFIG_LOG_LEVEL_INFO) {
+		if args != nil {
+			l.log.Printf("] - [ENV:%s] - [INFO]: %s  - [ARGS]: %d\n", l.config.LogEnvironment, message, args)
+		} else {
+			l.log.Printf("] - [ENV:%s] - [INFO]: %s\n", l.config.LogEnvironment, message)
+		}
+	}
+}
+
+func (l *golog) Warn(message string, args ...any) {
 	if l.shouldLog(CONFIG_LOG_LEVEL_WARN) {
 		if args != nil {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [INFO]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
+			l.log.Printf("] - [ENV:%s] - [WARN]: %s  - [ARGS]: %d\n", l.config.LogEnvironment, message, args)
 		} else {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [INFO]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
+			l.log.Printf("] - [ENV:%s] - [WARN]: %s\n", l.config.LogEnvironment, message)
 		}
 	}
 }
 
-func (l *log) Warn(message string, args ...any) {
-	if l.shouldLog(CONFIG_LOG_LEVEL_WARN) {
-		if args != nil {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [WARN]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
-		} else {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [WARN]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
-		}
-	}
-}
-
-func (l *log) Error(message string, args ...any) {
+func (l *golog) Error(message string, args ...any) {
 	if l.shouldLog(CONFIG_LOG_LEVEL_ERROR) {
 		if args != nil {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [ERROR]: %s  - [args]: %d\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message, args)
+			l.log.Printf("] - [ENV:%s] - [ERROR]: %s  - [ARGS]: %d\n", l.config.LogEnvironment, message, args)
 		} else {
-			fmt.Fprintf(l.config.writer, "[%s] - [ENV:%s] - [ERROR]: %s\n", time.Now().Format(time.RFC1123), l.config.LogEnvironment, message)
+			l.log.Printf("] - [ENV:%s] - [ERROR]: %s\n", l.config.LogEnvironment, message)
 		}
 	}
 }
 
-func (l *log) shouldLog(logtype int) bool {
+func (l *golog) shouldLog(logtype int) bool {
 	switch logtype {
 	case CONFIG_LOG_LEVEL_DEBUG:
 		return l.config.LogEnvironment == CONFIG_ENV_DEVELOPMENT
