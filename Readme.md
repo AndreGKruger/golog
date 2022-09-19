@@ -20,33 +20,40 @@ Then, to create a new logger, simply call the `New` function:
 To log a debug message, simply call the `Debug` function:
 
     logger.Debug("This is a debug message")
+or 
+    logger.Debug("This is a debug message with arguments", arg1, arg2, arg3)
 
 To log an info message, simply call the `Info` function:
     
     logger.Info("Hello, world!")
+or
+    logger.Info("Hello, world! with arguments", arg1, arg2, arg3)
 
 To log a warning message, simply call the `Warn` function:
 
     logger.Warn("Hello, world!")
+or
+    logger.Warn("Hello, world! with arguments", arg1, arg2, arg3)
 
 To log an error message, simply call the `Error` function:
     
     logger.Error("Hello, world!")
+or
+    logger.Error("Hello, world! with arguments", arg1, arg2, arg3)
 
 ## Configuration
 Golog can be configured to log to a file, to log to the console, or both. To configure Golog, simply call the `Configure` function:
 
-    logger.Configure(golog.Config{
-        LogToFile: true,
-        LogToConsole: true,
-        LogFile: "log.txt",
+    ok, err := logger.Configure(golog.Config{
+        LogEnvironment: golog.DEVELOPMENT,
+        LogFileName:    "log.txt",
+        LogTo:          golog.CONSOLE,
+        OutputFormat:   golog.OUTPUT_FORMAT_TEXT,
     })
 
-Output Format can be configured to be json or plain text. To configure Golog, simply call the `Configure` function:
+Json Output Format can be configured by passing the `OUTPUT_FORMAT_JSON` constant to the `OutputFormat` field of the `Config` struct:
 
-    logger.Configure(golog.Config{
-        OutputFormat: golog.OutputFormatJSON,
-    })
+    OutputFormat: golog.OUTPUT_FORMAT_JSON,
 
 ## Environment logging
 By default Golog will use the environment variable `GOLOG_ENV` to determine the log level. The following values are supported:
@@ -55,7 +62,7 @@ By default Golog will use the environment variable `GOLOG_ENV` to determine the 
     GOLOG_ENV=staging
     GOLOG_ENV=production
 
-To override the environment variable, simply call the `SetEnvironment` function:
+The GOLOG_ENV will override the environment variable that is set during the `SetEnvironment` function:
     logger.SetEnvironment(golog.DEVELOPMENT)
 
 ## Log Levels
@@ -72,10 +79,6 @@ By default the following matrix of log levels and environments is used:
     INFO: development, staging
     WARN: development, staging, production
     ERROR: development, staging, production
-
-<!-- To override the log levels for a specific environment, simply call the `SetLogLevel` function:
-
-    logger.SetLogLevel(golog.DEVELOPMENT, golog.DEBUG) -->
 
 ## Contributing
 If you would like to contribute to Golog, please fork the repository and submit a pull request.
