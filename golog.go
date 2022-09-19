@@ -11,7 +11,6 @@ type Log interface {
 	Warn(message string, args ...any)
 	Error(message string, args ...any)
 	Configure(*Config) (bool, error)
-	shouldLog(logtype int) bool
 }
 
 type golog struct {
