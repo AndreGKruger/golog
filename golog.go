@@ -1,6 +1,7 @@
 package golog
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 )
@@ -26,6 +27,11 @@ func New() Log {
 		config: &cnf,
 		log:    log.New(cnf.writer, "[ ", log.LstdFlags),
 	}
+}
+
+func (l *golog) logJson(message string, level string, args ...any) {
+	argBytes, _ := json.Marshal(args)
+	l.log.Printf(`] - {"env":"%s","level":"%s", "message":"%s", "args":%s}`, l.config.LogEnvironment, level, message, argBytes)
 }
 
 // Custom configuration for the logger
@@ -67,30 +73,42 @@ func (l *golog) Debug(message string, args ...any) {
 
 func (l *golog) Info(message string, args ...any) {
 	if l.shouldLog(CONFIG_LOG_LEVEL_INFO) {
-		if args != nil {
-			l.log.Printf("] - [ENV:%s] - [INFO]: %s  - [ARGS]: %+v\n", l.config.LogEnvironment, message, args)
+		if l.config.OutputFormat == CONFIG_OUTPUT_FORMAT_JSON {
+			l.logJson(message, "info", args)
 		} else {
-			l.log.Printf("] - [ENV:%s] - [INFO]: %s\n", l.config.LogEnvironment, message)
+			if args != nil {
+				l.log.Printf("] - [ENV:%s] - [INFO]: %s  - [ARGS]: %+v\n", l.config.LogEnvironment, message, args)
+			} else {
+				l.log.Printf("] - [ENV:%s] - [INFO]: %s\n", l.config.LogEnvironment, message)
+			}
 		}
 	}
 }
 
 func (l *golog) Warn(message string, args ...any) {
 	if l.shouldLog(CONFIG_LOG_LEVEL_WARN) {
-		if args != nil {
-			l.log.Printf("] - [ENV:%s] - [WARN]: %s  - [ARGS]: %+v\n", l.config.LogEnvironment, message, args)
+		if l.config.OutputFormat == CONFIG_OUTPUT_FORMAT_JSON {
+			l.logJson(message, "warn", args)
 		} else {
-			l.log.Printf("] - [ENV:%s] - [WARN]: %s\n", l.config.LogEnvironment, message)
+			if args != nil {
+				l.log.Printf("] - [ENV:%s] - [WARN]: %s  - [ARGS]: %+v\n", l.config.LogEnvironment, message, args)
+			} else {
+				l.log.Printf("] - [ENV:%s] - [WARN]: %s\n", l.config.LogEnvironment, message)
+			}
 		}
 	}
 }
 
 func (l *golog) Error(message string, args ...any) {
 	if l.shouldLog(CONFIG_LOG_LEVEL_ERROR) {
-		if args != nil {
-			l.log.Printf("] - [ENV:%s] - [ERROR]: %s  - [ARGS]: %+v\n", l.config.LogEnvironment, message, args)
+		if l.config.OutputFormat == CONFIG_OUTPUT_FORMAT_JSON {
+			l.logJson(message, "error", args)
 		} else {
-			l.log.Printf("] - [ENV:%s] - [ERROR]: %s\n", l.config.LogEnvironment, message)
+			if args != nil {
+				l.log.Printf("] - [ENV:%s] - [ERROR]: %s  - [ARGS]: %+v\n", l.config.LogEnvironment, message, args)
+			} else {
+				l.log.Printf("] - [ENV:%s] - [ERROR]: %s\n", l.config.LogEnvironment, message)
+			}
 		}
 	}
 }
