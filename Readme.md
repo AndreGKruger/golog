@@ -8,7 +8,7 @@ Golog is a very simple logging library for Go. It is designed to be simple to us
 ## Installation
 To install Golog, simply run the following command:
 
-    go get github.com/AndreGKruger/golog
+    go get github.com/AndreGKruger/golog@latest
 
 ---
 
@@ -17,56 +17,32 @@ To use Golog, simply import the package into your project:
 
     import "github.com/AndreGKruger/golog"
 
-Then, to create a new logger, simply call the `New` function:
+To create a new logger, simply call the `New` function:
 
     logger := golog.New()
 
-To log a debug message, simply call the `Debug` function:
+To log a debug message, simply call the `Debug`, `Info`, `Warn` or `Error` function:
 
     logger.Debug("This is a debug message")
-or 
     logger.Debug("This is a debug message with arguments", arg1, arg2, arg3)
-
-To log an info message, simply call the `Info` function:
-    
     logger.Info("Hello, world!")
-or
     logger.Info("Hello, world! with arguments", arg1, arg2, arg3)
-
-To log a warning message, simply call the `Warn` function:
-
     logger.Warn("Hello, world!")
-or
     logger.Warn("Hello, world! with arguments", arg1, arg2, arg3)
-
-To log an error message, simply call the `Error` function:
-    
     logger.Error("Hello, world!")
-or
     logger.Error("Hello, world! with arguments", arg1, arg2, arg3)
 
 ---
 
 ## Example output
-Input
-
-    log := New()
-        cnf := Config{
-            LogEnvironment: CONFIG_ENV_DEVELOPMENT,
-            LogFileName:    "test.log",
-            OutputFormat:   CONFIG_OUTPUT_FORMAT_JSON,
-            LogTo:          CONFIG_LOG_TO_FILE,
-        }
-        log.Debug("sample log message", cnf)
-
 Output
 
-    [ 2022/09/20 17:07:07 ] - [ENV:development] - [DEBUG]: sample log message  - [ARGS]: [{LogTo:4 OutputFormat:1 LogFileName:test.log LogEnvironment:development writer:<nil>}]
+    [ 2022/09/20 17:07:07 ] - [ENV:development] - [DEBUG]: sample log message  - [ARGS]: [{Test:Testing}]
 
 ---
 
 ## Configuration
-Golog can be configured to log to a file, to log to the console, or both. To configure Golog, simply call the `Configure` function:
+Golog can be configured to log to a file, to log to the console. To configure Golog, simply call the `Configure` function:
 
     ok, err := logger.Configure(golog.Config{
         LogEnvironment: golog.CONFIG_ENV_DEVELOPMENT,
